@@ -3,7 +3,7 @@ const Multiparty = require('multiparty');
 const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
-app.get('/hai', (req, res) => res.send('Hello World!'));
+app.get('/', (req, res) => res.send('Hello World!'));
 
 app.post('/voiceAuth',async (req,res)=>{
    let reqbody = await getFormData(req,{});
