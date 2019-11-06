@@ -2,7 +2,6 @@ const express = require('express');
 const Multiparty = require('multiparty');
 const bodyParser = require('body-parser');
 const app = express();
-const port = 3000
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 app.get('/hai', (req, res) => res.send('Hello World!'));
 
@@ -54,4 +53,12 @@ let getFormData = function(req,reqBody){
         form.parse(req);
     });  
 };
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
+
+
+var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
+var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
+ 
+
+
+app.listen(server_port, () => console.log(`Example app listening on port ${port} ${server_ip_address}!`));
