@@ -61,4 +61,4 @@ var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
  
 
 
-app.listen(server_port, () => console.log(`Example app listening on port ${port} ${server_ip_address}!`));
+app.listen(server_port, () => console.log(`Example app listening on port ${server_port} ${server_ip_address}!`));
