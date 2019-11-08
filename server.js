@@ -6,9 +6,13 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 app.get('/', (req, res) => res.send('Hello World!'));
 
 app.post('/voiceAuth',async (req,res) => {
-   let reqbody = await getFormData(req,{});
-   console.log(reqbody);
-   //res.send('recieved file');
+    try{ 
+    let reqbody = await getFormData(req,{});
+    console.log(reqbody);
+    }catch(e){
+        console.error(e);
+    }
+    res.send('recieved file');
 })
 
 
@@ -32,7 +36,7 @@ let getFormData = function(req,reqBody){
             }
             });
             part.on('error', function(err) {
-                logger.error( "Error in getformdata >> " + err);
+                console.error( "Error in getformdata >> " + err);
                 return reject({
                     code: 400,
                     message: "Invalid data in post form"
@@ -44,7 +48,7 @@ let getFormData = function(req,reqBody){
             return resolve(reqBody);
         });
         form.on('error', function(err) {
-            logger.error( "Error in getformdata >> " + err);
+            console.error( "Error in getformdata >> " + err);
             return reject({
                 code: 400,
                 message: "Invalid data in post form"
