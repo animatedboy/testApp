@@ -39,6 +39,7 @@ app.post('/voiceAuth', async (req, res) => {
     console.log("-- Write Completed --");
 });
 
+
 // function to receive the stream of data.
 
 let getFormData = function (req, reqBody) {
@@ -63,6 +64,7 @@ let getFormData = function (req, reqBody) {
             part.on('error', function (err) {
                 //logger.error( "Error in getformdata >> " + err);
                 console.log("Error in getformdata >> " + err);
+
                 return reject({
                     code: 400,
                     message: "Invalid data in post form"
@@ -73,9 +75,11 @@ let getFormData = function (req, reqBody) {
         form.on('close', function () {
             return resolve(reqBody);
         });
+
         form.on('error', function (err) {
             // logger.error( "Error in getformdata >> " + err);
             console.log("Error in getformdata >> " + err);
+
             return reject({
                 code: 400,
                 message: "Invalid data in post form"
