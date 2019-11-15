@@ -3,8 +3,10 @@ const Multiparty = require('multiparty');
 const bodyParser = require('body-parser');
 const app = express();
 const fs = require('fs');
+const url = require('url');
 
 var voiceit = require("./voiceit");
+const mongo = require('./mongodb');
 
 var recordingDirectory = './recordings';
 if (!fs.existsSync(recordingDirectory)) {
@@ -15,12 +17,40 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
+
+// To Create an User.
+app.get('/createUser', async (req, res) => {
+    var userResponse = await voiceit.createUser();
+    console.log(JSON.stringify(userResponse));
+    console.log(userResponse.userId);
+    res.send(userResponse);
+});
+
+// To delete an user.
+app.get('/deleteUser', async (req, res) => {
+    var query = url.parse(req.url, true).query;
+
+    var userResponse = await voiceit.deleteUser(query.user);
+    console.log(userResponse);
+    console.log(JSON.stringify(userResponse));
+    res.send(userResponse);
+});
+
 app.post('/enrollVoice', async (req, res) => {
+
     let reqbody = await getFormData(req, {});
+    var userResponse = await voiceit.createUser();
+
+    // insert ani and user id mapping to mongo db.
+    mongo.insertUser(reqbody.ani, userResponse.userId, reqbody.phrase);
+
     if (reqbody.recording) {
+        // write the file to a local directory.
         var filename = recordingDirectory + '/' + reqbody.recording.filename;
         fs.writeFileSync(filename, reqbody.recording.data);
-        var resp = await voiceit.enrollVoice(reqbody.userId, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
+
+        // call voiceit api to enroll voice.
+        var resp = await voiceit.enrollVoice(userResponse.userId, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
         console.log("Response:" + JSON.stringify(resp));
     }
     res.send(resp);
@@ -29,12 +59,20 @@ app.post('/enrollVoice', async (req, res) => {
 
 app.post('/voiceAuth', async (req, res) => {
     let reqbody = await getFormData(req, {});
+
+    // find the userid for the given ani.
+    var user = mongo.findUser(reqbody.ani);
+
     if (reqbody.recording) {
+        // write the file to a local directory.
         var filename = recordingDirectory + '/' + reqbody.recording.filename;
         fs.writeFileSync(filename, reqbody.recording.data);
-        var resp = await voiceit.verifyVoice(reqbody.userId, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
+
+        // call voiceit api to verfiy voice.
+        var resp = await voiceit.verifyVoice(user.userId, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
         console.log("Response:" + JSON.stringify(resp));
     }
+
     res.send(resp);
     console.log("-- Write Completed --");
 });

@@ -4,6 +4,34 @@ const voiceit2 = require('voiceit2-nodejs');
 // Initialize voiceit 
 let myVoiceIt = new voiceit2("key_264913c946354c3f9243abf5ac2b15a1", "tok_53da855ff3f748248f87e160784ffdd3");
 
+var deleteUser = (userId) => {
+  console.log('Method: deleteUser');
+  return new Promise((resolve, reject) => {
+    try {
+      myVoiceIt.deleteUser({
+        userId: userId
+      }, (jsonResponse) => {
+        resolve(jsonResponse);
+      });
+    } catch (ex) {
+      reject('API call Failed.');
+    }
+  });
+}
+
+var createUser = () => {
+  console.log('Method: createUser');
+  return new Promise((resolve, reject) => {
+    try {
+      myVoiceIt.createUser((jsonResponse) => {
+        resolve(jsonResponse);
+      });
+    } catch (ex) {
+      reject('API call Failed.');
+    }
+  });
+}
+
 // To list the phrases available in the VoiceIt API.
 var listphrases = (contentLanguage) => {
   console.log(`Method:listphrases, Language:${contentLanguage}`);
@@ -15,7 +43,7 @@ var listphrases = (contentLanguage) => {
       });
     } catch (ex) {
       console.log('Method: listphrases. ' + ex);
-      reject("Failure");
+      reject('API call Failed.');
     }
   });
 }
@@ -36,7 +64,7 @@ var enrollVoice = (user, content, phrase, audioFilePath) => {
       });
     } catch (ex) {
       console.log('Method: enrollVoice. ' + ex);
-      reject("Failure");
+      reject('API call Failed.');
     }
   });
 }
@@ -58,7 +86,7 @@ var verifyVoice = (user, content, phrase, audioFilePath) => {
       });
     } catch (ex) {
       console.log('Method: verifyVoice. ' + ex);
-      reject("Failure");
+      reject('API call Failed.');
     }
   });
 }
@@ -66,5 +94,7 @@ var verifyVoice = (user, content, phrase, audioFilePath) => {
 module.exports = {
   listphrases,
   enrollVoice,
-  verifyVoice
+  verifyVoice,
+  createUser,
+  deleteUser
 }
