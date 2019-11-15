@@ -65,8 +65,12 @@ app.post('/voiceAuth', async (req, res) => {
         //var user = mongo.findUser(reqbody.ani);
         console.log('Request: ' + JSON.stringify(reqbody));
         if (reqbody.recordfile) {
+            
+            var file = reqbody.recordfile.filename;
+            file = file.replace('/tmp/','').replace('.dat','.wav');
+
             // write the file to a local directory.
-            var filename = recordingDirectory + '/' + reqbody.recordfile.filename;
+            var filename = recordingDirectory + '/' + file;
             fs.writeFileSync(filename, reqbody.recordfile.data);
 
             // call voiceit api to verfiy voice.
