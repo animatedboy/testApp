@@ -6,7 +6,7 @@ const fs = require('fs');
 const url = require('url');
 
 var voiceit = require("./voiceit");
-const mongo = require('./mongodb');
+//const mongo = require('./mongodb');
 
 var recordingDirectory = './recordings';
 if (!fs.existsSync(recordingDirectory)) {
@@ -42,7 +42,7 @@ app.post('/enrollVoice', async (req, res) => {
     var userResponse = await voiceit.createUser();
 
     // insert ani and user id mapping to mongo db.
-    mongo.insertUser(reqbody.ani, userResponse.userId, reqbody.phrase);
+    //mongo.insertUser(reqbody.ani, userResponse.userId, reqbody.phrase);
 
     if (reqbody.recording) {
         // write the file to a local directory.
