@@ -63,7 +63,7 @@ app.post('/voiceAuth', async (req, res) => {
 
         // find the userid for the given ani.
         //var user = mongo.findUser(reqbody.ani);
-        console.log('Request: '+reqbody);
+        console.log('Request: ' + JSON.stringify(reqbody));
         if (reqbody.recordfile) {
             // write the file to a local directory.
             var filename = recordingDirectory + '/' + reqbody.recordfile.filename;
