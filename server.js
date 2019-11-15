@@ -63,11 +63,11 @@ app.post('/voiceAuth', async (req, res) => {
 
         // find the userid for the given ani.
         //var user = mongo.findUser(reqbody.ani);
-        console.log(reqbody);
-        if (reqbody.recording) {
+        console.log('Request: '+reqbody);
+        if (reqbody.recordfile) {
             // write the file to a local directory.
-            var filename = recordingDirectory + '/' + reqbody.recording.filename;
-            fs.writeFileSync(filename, reqbody.recording.data);
+            var filename = recordingDirectory + '/' + reqbody.recordfile.filename;
+            fs.writeFileSync(filename, reqbody.recordfile.data);
 
             // call voiceit api to verfiy voice.
             var resp = await voiceit.verifyVoice('usr_143748d26ace4b4dbd3502cdd1b11cac', reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
@@ -76,7 +76,7 @@ app.post('/voiceAuth', async (req, res) => {
 
         res.send(resp);
     } catch (e) {
-        res.sendStatus(400).send('Error');
+        res.status(400).send('Error');
     }
     console.log("-- Write Completed --");
 });
@@ -85,8 +85,8 @@ app.post('/voiceAuth', async (req, res) => {
 // function to receive the stream of data.
 
 let getFormData = function (req, reqBody) {
-    console.log('------- req -------');
-    console.log(req);
+    // console.log('------- req -------');
+    // console.log(req);
     return new Promise((resolve, reject) => {
         let form = new Multiparty.Form();
 
