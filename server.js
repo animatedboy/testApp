@@ -58,22 +58,26 @@ app.post('/enrollVoice', async (req, res) => {
 });
 
 app.post('/voiceAuth', async (req, res) => {
-    let reqbody = await getFormData(req, {});
+    try {
+        let reqbody = await getFormData(req, {});
 
-    // find the userid for the given ani.
-    //var user = mongo.findUser(reqbody.ani);
-    console.log(reqbody);
-    if (reqbody.recording) {
-        // write the file to a local directory.
-        var filename = recordingDirectory + '/' + reqbody.recording.filename;
-        fs.writeFileSync(filename, reqbody.recording.data);
+        // find the userid for the given ani.
+        //var user = mongo.findUser(reqbody.ani);
+        console.log(reqbody);
+        if (reqbody.recording) {
+            // write the file to a local directory.
+            var filename = recordingDirectory + '/' + reqbody.recording.filename;
+            fs.writeFileSync(filename, reqbody.recording.data);
 
-        // call voiceit api to verfiy voice.
-        var resp = await voiceit.verifyVoice('usr_143748d26ace4b4dbd3502cdd1b11cac', reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
-        console.log("Response:" + JSON.stringify(resp));
+            // call voiceit api to verfiy voice.
+            var resp = await voiceit.verifyVoice('usr_143748d26ace4b4dbd3502cdd1b11cac', reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
+            console.log("Response:" + JSON.stringify(resp));
+        }
+
+        res.send(resp);
+    } catch (e) {
+        res.sendStatus(400).send('Error');
     }
-
-    res.send(resp);
     console.log("-- Write Completed --");
 });
 
@@ -81,6 +85,8 @@ app.post('/voiceAuth', async (req, res) => {
 // function to receive the stream of data.
 
 let getFormData = function (req, reqBody) {
+    console.log('------- req -------');
+    console.log(req);
     return new Promise((resolve, reject) => {
         let form = new Multiparty.Form();
 
