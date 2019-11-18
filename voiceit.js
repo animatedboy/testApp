@@ -2,7 +2,7 @@
 const voiceit2 = require('voiceit2-nodejs');
 
 // Initialize voiceit 
-let myVoiceIt = new voiceit2("key_264913c946354c3f9243abf5ac2b15a1", "tok_53da855ff3f748248f87e160784ffdd3");
+let myVoiceIt = new voiceit2("key_4021b35a5b5a463abceca8cf473f2d57", "tok_172374c191da4469915e8e3e31132878");
 
 var deleteUser = (userId) => {
   console.log('Method: deleteUser');

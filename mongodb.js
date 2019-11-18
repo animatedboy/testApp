@@ -73,6 +73,13 @@ async function testDB() {
     console.log(`Found User` + JSON.stringify(finduser));
 }
 
+function testString(){
+    var testString = '/tmp/10_9605917.dat';
+
+    testString.replace('/tmp/','').replace('.dat','.wav');
+}
+
+
 module.exports = {
     insertUser,
     findUser

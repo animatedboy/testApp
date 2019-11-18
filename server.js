@@ -6,7 +6,7 @@ const fs = require('fs');
 const url = require('url');
 
 var voiceit = require("./voiceit");
-//const mongo = require('./mongodb');
+const props = require('./userprops');
 
 var recordingDirectory = './recordings';
 if (!fs.existsSync(recordingDirectory)) {
@@ -42,12 +42,12 @@ app.post('/enrollVoice', async (req, res) => {
     var userResponse = await voiceit.createUser();
 
     // insert ani and user id mapping to mongo db.
-    //mongo.insertUser(reqbody.ani, userResponse.userId, reqbody.phrase);
+    props.addUsers(reqbody.ani, userResponse.userId, reqbody.phrase);
 
-    if (reqbody.recording) {
+    if (reqbody.recordfile) {
         // write the file to a local directory.
-        var filename = recordingDirectory + '/' + reqbody.recording.filename;
-        fs.writeFileSync(filename, reqbody.recording.data);
+        var filename = recordingDirectory + '/' + reqbody.recordfile.filename;
+        fs.writeFileSync(filename, reqbody.recordfile.data);
 
         // call voiceit api to enroll voice.
         var resp = await voiceit.enrollVoice(userResponse.userId, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
@@ -62,19 +62,20 @@ app.post('/voiceAuth', async (req, res) => {
         let reqbody = await getFormData(req, {});
 
         // find the userid for the given ani.
-        //var user = mongo.findUser(reqbody.ani);
+        var user = props.getUser(reqbody.ani);
+
         console.log('Request: ' + JSON.stringify(reqbody));
         if (reqbody.recordfile) {
-            
+
             var file = reqbody.recordfile.filename;
-            file = file.replace('/tmp/','').replace('.dat','.wav');
+            file = file.replace('/tmp/', '').replace('.dat', '.wav');
 
             // write the file to a local directory.
             var filename = recordingDirectory + '/' + file;
             fs.writeFileSync(filename, reqbody.recordfile.data);
 
             // call voiceit api to verfiy voice.
-            var resp = await voiceit.verifyVoice('usr_143748d26ace4b4dbd3502cdd1b11cac', reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
+            var resp = await voiceit.verifyVoice(user.userid, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
             console.log("Response:" + JSON.stringify(resp));
         }
 
