@@ -39,10 +39,20 @@ app.get('/deleteUser', async (req, res) => {
 app.post('/enrollVoice', async (req, res) => {
 
     let reqbody = await getFormData(req, {});
-    var userResponse = await voiceit.createUser();
+
+    var us = await props.getUser(reqbody.ani);
+    var userid;
+    if (us) {
+        console.log('User available.' + us.ani);
+        userid = us.userid;
+    } else {
+        console.log('User not available. Creating new User.');
+        var userResponse = await voiceit.createUser();
+        userid = userResponse.userId;
+    }
 
     // insert ani and user id mapping to mongo db.
-    props.addUsers(reqbody.ani, userResponse.userId, reqbody.phrase);
+    props.addUsers(reqbody.ani, userid, reqbody.phrase);
 
     if (reqbody.recordfile) {
         // write the file to a local directory.
@@ -50,9 +60,10 @@ app.post('/enrollVoice', async (req, res) => {
         fs.writeFileSync(filename, reqbody.recordfile.data);
 
         // call voiceit api to enroll voice.
-        var resp = await voiceit.enrollVoice(userResponse.userId, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
+        var resp = await voiceit.enrollVoice(userid, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
         console.log("Response:" + JSON.stringify(resp));
     }
+
     res.send(resp);
     console.log("-- Write Completed --");
 });
@@ -62,7 +73,7 @@ app.post('/voiceAuth', async (req, res) => {
         let reqbody = await getFormData(req, {});
 
         // find the userid for the given ani.
-        var user = props.getUser(reqbody.ani);
+        var user = await props.getUser(reqbody.ani);
 
         console.log('Request: ' + JSON.stringify(reqbody));
         if (reqbody.recordfile) {

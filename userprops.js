@@ -58,18 +58,36 @@ var getUser = (ani) => {
         try {
             console.log(`Method: getUser, ani:${ani}`);
             var obj = JSON.parse(fs.readFileSync(file));
+            var userData;
             obj.users.forEach((item) => {
                 if (item.ani == ani) {
                     console.log('ANI:' + JSON.stringify(item));
-                    resolve(item);
+                    userData = item;
                 }
             });
+            if (userData) {
+                resolve(userData);
+            } else {
+                resolve(null);
+            }
         } catch (ex) {
             reject(`Error reading file. Error:${ex}`);
         }
     });
 }
 
+var testGetUser = async (ani) => {
+    var user = await getUser(ani);
+    if (user) {
+        console.log('~~~ asdf ~~~');
+        console.log('User:' + JSON.stringify(user));
+        console.log('Valid: ' + user.ani);
+        console.log('Valid: ' + user.userid);
+    }
+    console.log('~~~ qwe ~~~');
+}
+
+// testGetUser('99767023');
 // addUsers('8667076180', 'asdfaeqaf765sf9da7s6dfoasgo76');
 // addUsers('9976702323', 'sdfsv23fsd34kksdflssdfwerwerq');
 // getUser('9976702323');
