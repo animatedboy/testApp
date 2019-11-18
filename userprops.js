@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-var userDirectory = './users';
+var userDirectory = 'users';
 var fileName = 'user.json';
 var file = userDirectory + '/' + fileName;
 
@@ -88,9 +88,12 @@ var testGetUser = async (ani) => {
 }
 
 // testGetUser('99767023');
-// addUsers('8667076180', 'asdfaeqaf765sf9da7s6dfoasgo76');
-// addUsers('9976702323', 'sdfsv23fsd34kksdflssdfwerwerq');
-// getUser('9976702323');
+
+async function test() {
+    var u1 = await addUsers('8667076180', 'asdfaeqaf765sf9da7s6dfoasgo76', 'zxcv');
+    var u2 = await addUsers('9976702323', 'sdfsv23fsd34kksdflssdfwerwerq', 'zxcvasdf');
+    console.log(getUser('9976702323'));
+}
 
 module.exports = {
     addUsers,
