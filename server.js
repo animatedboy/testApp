@@ -5,8 +5,8 @@ const app = express();
 const fs = require('fs');
 const url = require('url');
 
-var voiceit = require("./voiceit");
-const props = require('./userprops');
+//var voiceit = require("./voiceit.js");
+//const props = require('./userprops.js');
 
 var userArray = {
     'users': [{
@@ -48,6 +48,10 @@ if (!fs.existsSync(recordingDirectory)) {
 }
 
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+app.use(bodyParser.json({ 
+    limit: '10mb' ,
+    type: ['application/json', 'application/csp-report']
+  }));
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
