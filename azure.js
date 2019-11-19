@@ -89,7 +89,7 @@ var createProfile = () => {
 }
 
 var createEnrollment = (userid, filename) => {
-
+    console.log('Method createEnrollment');
     var createEnrollmentOptions = {
         hostname: baseURL,
         port: 443,
@@ -128,14 +128,14 @@ var createEnrollment = (userid, filename) => {
             // var data = fs.createReadStream('C:/Users/schakara/Desktop/IWC/Phrases/azure/20191119-174911.wav');
             // var data = fs.readFileSync('C:/Users/schakara/Desktop/IWC/Phrases/azure/enrollment.wav');
             var audioData = {
-                'data': fs.readFileSync(filename)
+                'data': fs.createReadStream(filename)
             }
 
             req.write(audioData);
             req.end();
 
         } catch (ex) {
-            console.log('Exception: ' + ex);
+            console.log('API Exception: ' + ex);
         }
     });
 }
@@ -194,8 +194,6 @@ var verifyVoiceContent = (userid, filename) => {
     });
 }
 
-
-createEnrollment('62cf8d8a-b009-4102-8ed4-fc91db784552');
 
 module.exports = {
     createProfile,

@@ -315,7 +315,7 @@ app.post('/voiceAuth', async (req, res) => {
 
             // call voiceit api to verfiy voice.
             var resp = await azure.verifyVoiceContent(user, filename);
-            console.log("Response:" + JSON.stringify(resp));
+            console.log("Server Response:" + JSON.stringify(resp));
         }
 
         res.status(200).send(resp);
