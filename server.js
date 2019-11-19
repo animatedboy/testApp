@@ -189,6 +189,33 @@ let getFormData = function (req, reqBody) {
 };
 
 
+var userData = [{
+    device_id : 'iot_001_samqwe',
+    username:'vamshi',
+    firstName:"Vamshi",
+    LastName:"patel",
+    phoneNumber:"16503971085"
+},{
+    device_id : 'iot_002_samrty',
+    username:'ragusizzles',
+    firstName:"Raguram",
+    LastName:"Mohandas",
+    phoneNumber:"16503971085"
+}]
+
+app.get('/iot/userdata', async (req, res) => {
+   var device_id = req.query.device_id;
+   if(!device_id){
+       res.status(400).send({error:"no device_id is given"});
+   }
+    var result = userData.filter((user)=>{
+        return user.device_id === device_id;
+    });
+
+    res.status(200).send(result[0])
+});
+
+
 
 
 var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
