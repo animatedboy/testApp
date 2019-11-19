@@ -5,8 +5,8 @@ const app = express();
 const fs = require('fs');
 const url = require('url');
 
-var voiceit = require("./voiceit");
-const props = require('./userprops');
+//var voiceit = require("./voiceit.js");
+//const props = require('./userprops.js');
 
 var userArray = {
     'users': [{
@@ -48,6 +48,10 @@ if (!fs.existsSync(recordingDirectory)) {
 }
 
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+app.use(bodyParser.json({ 
+    limit: '10mb' ,
+    type: ['application/json', 'application/csp-report']
+  }));
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
@@ -189,6 +193,33 @@ let getFormData = function (req, reqBody) {
         form.parse(req);
     });
 };
+
+
+var userData = [{
+    device_id : 'iot_001_samqwe',
+    username:'vamshi',
+    firstName:"Vamshi",
+    LastName:"patel",
+    phoneNumber:"16503971085"
+},{
+    device_id : 'iot_002_samrty',
+    username:'ragusizzles',
+    firstName:"Raguram",
+    LastName:"Mohandas",
+    phoneNumber:"16503971085"
+}]
+
+app.get('/iot/userdata', async (req, res) => {
+   var device_id = req.query.device_id;
+   if(!device_id){
+       res.status(400).send({error:"no device_id is given"});
+   }
+    var result = userData.filter((user)=>{
+        return user.device_id === device_id;
+    });
+
+    res.status(200).send(result[0])
+});
 
 
 
