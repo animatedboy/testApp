@@ -203,8 +203,8 @@ var userData = [{
     phoneNumber:"16503971085"
 }]
 
-app.get('/iot/userdata', async (req, res) => {
-   var device_id = req.query.device_id;
+app.post('/iot/userdata', async (req, res) => {
+   var device_id = req.body.device_id;
    if(!device_id){
        res.status(400).send({error:"no device_id is given"});
    }
