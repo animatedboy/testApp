@@ -8,6 +8,40 @@ const url = require('url');
 var voiceit = require("./voiceit");
 const props = require('./userprops');
 
+var userArray = {
+    'users': [{
+        ani: '9976702548',
+        userid: 'usr_d22154e4a8be43e7ad601decf18bbced',
+        active: 'y'
+    }, {
+        ani: "9600860640",
+        userid: "usr_d22154e4a8be43e7ad601decf18be091",
+        active: "y"
+    }]
+}
+
+function addUser(ani, userid) {
+    var userobj = {
+        ani: ani,
+        userid: userid,
+        active: 'y'
+    }
+    userArray.users.push(userobj);
+    console.log('addUser - Available users in User Array. Array :' + JSON.stringify(userArray));
+}
+
+function getUser(ani) {
+    console.log('getUser - Available users in User Array. Array :' + JSON.stringify(userArray));
+    var result;
+    userArray.users.forEach((item) => {
+        console.log(`Loop: ${item}`);
+        if (item.ani == ani) {
+            result = item;
+        }
+    });
+    return result;
+}
+
 var recordingDirectory = './recordings';
 if (!fs.existsSync(recordingDirectory)) {
     fs.mkdirSync(recordingDirectory);
@@ -40,7 +74,8 @@ app.post('/enrollVoice', async (req, res) => {
 
     let reqbody = await getFormData(req, {});
 
-    var us = await props.getUser(reqbody.ani);
+    // var us = await props.getUser(reqbody.ani);
+    var us = getUser(reqbody.ani);
     var userid;
     if (us) {
         console.log('User available.' + us.ani);
@@ -49,10 +84,12 @@ app.post('/enrollVoice', async (req, res) => {
         console.log('User not available. Creating new User.');
         var userResponse = await voiceit.createUser();
         userid = userResponse.userId;
+        // insert ani and user id mapping to mongo db.
+        // props.addUsers(reqbody.ani, userid, reqbody.phrase);
+        addUser(reqbody.ani, userid);
     }
 
-    // insert ani and user id mapping to mongo db.
-    props.addUsers(reqbody.ani, userid, reqbody.phrase);
+
 
     if (reqbody.recordfile) {
         // write the file to a local directory.
@@ -73,9 +110,10 @@ app.post('/voiceAuth', async (req, res) => {
         let reqbody = await getFormData(req, {});
 
         // find the userid for the given ani.
-        var user = await props.getUser(reqbody.ani);
+        // var user = await props.getUser(reqbody.ani);
+        var user = getUser(reqbody.ani);
 
-        console.log('Request: ' + JSON.stringify(reqbody));
+        // console.log('Request: ' + JSON.stringify(reqbody));
         if (reqbody.recordfile) {
 
             var file = reqbody.recordfile.filename;
@@ -90,7 +128,7 @@ app.post('/voiceAuth', async (req, res) => {
             console.log("Response:" + JSON.stringify(resp));
         }
 
-        res.send(resp);
+        res.status(200).send(resp);
     } catch (e) {
         res.status(400).send('Error');
     }
@@ -149,6 +187,8 @@ let getFormData = function (req, reqBody) {
         form.parse(req);
     });
 };
+
+
 
 
 var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
