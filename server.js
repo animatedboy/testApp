@@ -259,7 +259,7 @@ if (!fs.existsSync(azureRecordingDirectory)) {
     fs.mkdirSync(azureRecordingDirectory);
 }
 
-app.post('/azureEnrollVoice', (request, response) => {
+app.post('/azureEnrollVoice',async (request, response) => {
     let reqbody = await getFormData(req, {});
 
     // var us = await props.getUser(reqbody.ani);
