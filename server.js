@@ -111,35 +111,35 @@ app.post('/enrollVoice', async (req, res) => {
     console.log("-- Write Completed --");
 });
 
-// app.post('/voiceAuth', async (req, res) => {
-//     try {
-//         let reqbody = await getFormData(req, {});
+app.post('/voiceAuth', async (req, res) => {
+    try {
+        let reqbody = await getFormData(req, {});
 
-//         // find the userid for the given ani.
-//         // var user = await props.getUser(reqbody.ani);
-//         var user = getUser(reqbody.ani);
+        // find the userid for the given ani.
+        // var user = await props.getUser(reqbody.ani);
+        var user = getUser(reqbody.ani);
 
-//         // console.log('Request: ' + JSON.stringify(reqbody));
-//         if (reqbody.recordfile) {
+        // console.log('Request: ' + JSON.stringify(reqbody));
+        if (reqbody.recordfile) {
 
-//             var file = reqbody.recordfile.filename;
-//             file = file.replace('/tmp/', '').replace('.dat', '.wav');
+            var file = reqbody.recordfile.filename;
+            file = file.replace('/tmp/', '').replace('.dat', '.wav');
 
-//             // write the file to a local directory.
-//             var filename = recordingDirectory + '/' + file;
-//             fs.writeFileSync(filename, reqbody.recordfile.data);
+            // write the file to a local directory.
+            var filename = recordingDirectory + '/' + file;
+            fs.writeFileSync(filename, reqbody.recordfile.data);
 
-//             // call voiceit api to verfiy voice.
-//             var resp = await voiceit.verifyVoice(user.userid, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
-//             console.log("Response:" + JSON.stringify(resp));
-//         }
+            // call voiceit api to verfiy voice.
+            var resp = await voiceit.verifyVoice(user.userid, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
+            console.log("Response:" + JSON.stringify(resp));
+        }
 
-//         res.status(200).send(resp);
-//     } catch (e) {
-//         res.status(400).send('Error');
-//     }
-//     console.log("-- Write Completed --");
-// });
+        res.status(200).send(resp);
+    } catch (e) {
+        res.status(400).send('Error');
+    }
+    console.log("-- Write Completed --");
+});
 
 
 // function to receive the stream of data.
@@ -259,7 +259,7 @@ if (!fs.existsSync(azureRecordingDirectory)) {
     fs.mkdirSync(azureRecordingDirectory);
 }
 
-app.post('/azureEnrollVoice',async (request, response) => {
+app.post('/azureEnrollVoice', async (request, response) => {
     let reqbody = await getFormData(req, {});
 
     // var us = await props.getUser(reqbody.ani);
@@ -295,7 +295,7 @@ app.post('/azureEnrollVoice',async (request, response) => {
     console.log("-- Write Completed --");
 });
 
-app.post('/voiceAuth', async (req, res) => {
+app.post('/azureVoiceAuth', async (req, res) => {
     try {
         let reqbody = await getFormData(req, {});
 
