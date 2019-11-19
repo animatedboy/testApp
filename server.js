@@ -5,8 +5,7 @@ const app = express();
 const fs = require('fs');
 const url = require('url');
 
-//var voiceit = require("./voiceit.js");
-//const props = require('./userprops.js');
+var voiceit = require("./voiceit.js");
 
 var userArray = {
     'users': [{
