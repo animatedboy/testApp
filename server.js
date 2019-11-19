@@ -6,6 +6,7 @@ const fs = require('fs');
 const url = require('url');
 
 var voiceit = require("./voiceit.js");
+var azure = require("./azure.js");
 
 var userArray = {
     'users': [{
@@ -47,10 +48,10 @@ if (!fs.existsSync(recordingDirectory)) {
 }
 
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
-app.use(bodyParser.json({ 
-    limit: '10mb' ,
+app.use(bodyParser.json({
+    limit: '10mb',
     type: ['application/json', 'application/csp-report']
-  }));
+}));
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
@@ -110,35 +111,35 @@ app.post('/enrollVoice', async (req, res) => {
     console.log("-- Write Completed --");
 });
 
-app.post('/voiceAuth', async (req, res) => {
-    try {
-        let reqbody = await getFormData(req, {});
+// app.post('/voiceAuth', async (req, res) => {
+//     try {
+//         let reqbody = await getFormData(req, {});
 
-        // find the userid for the given ani.
-        // var user = await props.getUser(reqbody.ani);
-        var user = getUser(reqbody.ani);
+//         // find the userid for the given ani.
+//         // var user = await props.getUser(reqbody.ani);
+//         var user = getUser(reqbody.ani);
 
-        // console.log('Request: ' + JSON.stringify(reqbody));
-        if (reqbody.recordfile) {
+//         // console.log('Request: ' + JSON.stringify(reqbody));
+//         if (reqbody.recordfile) {
 
-            var file = reqbody.recordfile.filename;
-            file = file.replace('/tmp/', '').replace('.dat', '.wav');
+//             var file = reqbody.recordfile.filename;
+//             file = file.replace('/tmp/', '').replace('.dat', '.wav');
 
-            // write the file to a local directory.
-            var filename = recordingDirectory + '/' + file;
-            fs.writeFileSync(filename, reqbody.recordfile.data);
+//             // write the file to a local directory.
+//             var filename = recordingDirectory + '/' + file;
+//             fs.writeFileSync(filename, reqbody.recordfile.data);
 
-            // call voiceit api to verfiy voice.
-            var resp = await voiceit.verifyVoice(user.userid, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
-            console.log("Response:" + JSON.stringify(resp));
-        }
+//             // call voiceit api to verfiy voice.
+//             var resp = await voiceit.verifyVoice(user.userid, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
+//             console.log("Response:" + JSON.stringify(resp));
+//         }
 
-        res.status(200).send(resp);
-    } catch (e) {
-        res.status(400).send('Error');
-    }
-    console.log("-- Write Completed --");
-});
+//         res.status(200).send(resp);
+//     } catch (e) {
+//         res.status(400).send('Error');
+//     }
+//     console.log("-- Write Completed --");
+// });
 
 
 // function to receive the stream of data.
@@ -195,30 +196,135 @@ let getFormData = function (req, reqBody) {
 
 
 var userData = [{
-    device_id : 'iot_001_samqwe',
-    username:'vamshi',
-    firstName:"Vamshi",
-    LastName:"patel",
-    phoneNumber:"16503971085"
-},{
-    device_id : 'iot_002_samrty',
-    username:'ragusizzles',
-    firstName:"Raguram",
-    LastName:"Mohandas",
-    phoneNumber:"16503971085"
+    device_id: 'iot_001_samqwe',
+    username: 'vamshi',
+    firstName: "Vamshi",
+    LastName: "patel",
+    phoneNumber: "16503971085"
+}, {
+    device_id: 'iot_002_samrty',
+    username: 'ragusizzles',
+    firstName: "Raguram",
+    LastName: "Mohandas",
+    phoneNumber: "16503971085"
 }]
 
 app.get('/iot/userdata', async (req, res) => {
-   var device_id = req.query.device_id;
-   if(!device_id){
-       res.status(400).send({error:"no device_id is given"});
-   }
-    var result = userData.filter((user)=>{
+    var device_id = req.query.device_id;
+    if (!device_id) {
+        res.status(400).send({ error: "no device_id is given" });
+    }
+    var result = userData.filter((user) => {
         return user.device_id === device_id;
     });
 
     res.status(200).send(result[0])
 });
+
+
+// ----------- Code for Azure -----------------
+
+var azureUserArray = {
+    'users': [{
+        ani: '9600860640',
+        userid: 'cc54d1c4-57c3-42f4-971c-46db201a3fd0',
+        active: 'y'
+    }]
+}
+
+function addAzureUser(ani, userid) {
+    var userobj = {
+        ani: ani,
+        userid: userid,
+        active: 'y'
+    }
+    azureUserArray.users.push(userobj);
+    console.log('addAzureUser - Available users in User Array. Array :' + JSON.stringify(azureUserArray));
+}
+
+function getAzureUser(ani) {
+    console.log('getAzureUser - Available users in User Array. Array :' + JSON.stringify(azureUserArray));
+    var result;
+    azureUserArray.users.forEach((item) => {
+        console.log(`Loop: ${item}`);
+        if (item.ani == ani) {
+            result = item;
+        }
+    });
+    return result;
+}
+
+var azureRecordingDirectory = './azurerecordings';
+if (!fs.existsSync(azureRecordingDirectory)) {
+    fs.mkdirSync(azureRecordingDirectory);
+}
+
+app.post('/azureEnrollVoice', (request, response) => {
+    let reqbody = await getFormData(req, {});
+
+    // var us = await props.getUser(reqbody.ani);
+    var us = getAzureUser(reqbody.ani);
+    var userid;
+    if (us) {
+        console.log('User available.' + us.ani);
+        userid = us.userid;
+    } else {
+        console.log('User not available. Creating new User.');
+        var userResponse = await azure.createProfile();
+        userid = userResponse.identificationProfileId;
+        // insert ani and user id mapping to mongo db.
+        // props.addUsers(reqbody.ani, userid, reqbody.phrase);
+        addAzureUser(reqbody.ani, userid);
+    }
+
+    if (reqbody.recordfile) {
+
+        var file = reqbody.recordfile.filename;
+        file = file.replace('/tmp/', '').replace('.dat', '.wav');
+
+        // write the file to a local directory.
+        var filename = azureRecordingDirectory + '/' + file;
+        fs.writeFileSync(filename, reqbody.recordfile.data);
+
+        // call voiceit api to enroll voice.
+        var resp = await azure.createEnrollment(userid, filename);
+        console.log("Response:" + JSON.stringify(resp));
+    }
+
+    res.status(200).send(resp);
+    console.log("-- Write Completed --");
+});
+
+app.post('/voiceAuth', async (req, res) => {
+    try {
+        let reqbody = await getFormData(req, {});
+
+        // find the userid for the given ani.
+        // var user = await props.getUser(reqbody.ani);
+        var user = getAzureUser(reqbody.ani);
+        user = 'cc54d1c4-57c3-42f4-971c-46db201a3fd0';
+        // console.log('Request: ' + JSON.stringify(reqbody));
+        if (reqbody.recordfile) {
+
+            var file = reqbody.recordfile.filename;
+            file = file.replace('/tmp/', '').replace('.dat', '.wav');
+
+            // write the file to a local directory.
+            var filename = azureRecordingDirectory + '/' + file;
+            fs.writeFileSync(filename, reqbody.recordfile.data);
+
+            // call voiceit api to verfiy voice.
+            var resp = await azure.verifyVoiceContent(user, filename);
+            console.log("Response:" + JSON.stringify(resp));
+        }
+
+        res.status(200).send(resp);
+    } catch (e) {
+        res.status(400).send('Error');
+    }
+    console.log("-- Write Completed --");
+});
+
 
 
 
