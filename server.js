@@ -89,11 +89,13 @@ app.post('/enrollVoice', async (req, res) => {
         addUser(reqbody.ani, userid);
     }
 
-
-
     if (reqbody.recordfile) {
+
+        var file = reqbody.recordfile.filename;
+        file = file.replace('/tmp/', '').replace('.dat', '.wav');
+
         // write the file to a local directory.
-        var filename = recordingDirectory + '/' + reqbody.recordfile.filename;
+        var filename = recordingDirectory + '/' + file;
         fs.writeFileSync(filename, reqbody.recordfile.data);
 
         // call voiceit api to enroll voice.
