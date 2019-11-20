@@ -17,6 +17,10 @@ var userArray = {
         ani: "9600860640",
         userid: "usr_d22154e4a8be43e7ad601decf18be091",
         active: "y"
+    }, {
+        ani: "+914440917347",
+        userid: "usr_f82f1a641b8a498fb126b4c81063ebe3",
+        active: "y"
     }]
 }
 
@@ -34,7 +38,7 @@ function getUser(ani) {
     console.log('getUser - Available users in User Array. Array :' + JSON.stringify(userArray));
     var result;
     userArray.users.forEach((item) => {
-        console.log(`Loop: ${item}`);
+        console.log('Loop:' + JSON.stringify(item));
         if (item.ani == ani) {
             result = item;
         }
@@ -93,6 +97,8 @@ app.post('/enrollVoice', async (req, res) => {
         addUser(reqbody.ani, userid);
     }
 
+    console.log(`voice enrollment. ani:${reqbody.ani}, userid:${userid}`);
+
     if (reqbody.recordfile) {
 
         var file = reqbody.recordfile.filename;
@@ -108,16 +114,19 @@ app.post('/enrollVoice', async (req, res) => {
     }
 
     res.send(resp);
-    console.log("-- Write Completed --");
+    console.log("-- Enrollment Completed --");
 });
 
 app.post('/voiceAuth', async (req, res) => {
+
     try {
         let reqbody = await getFormData(req, {});
 
         // find the userid for the given ani.
         // var user = await props.getUser(reqbody.ani);
         var user = getUser(reqbody.ani);
+
+        console.log(`voice verifcation. ani:${reqbody.ani}, userid:${user}`);
 
         // console.log('Request: ' + JSON.stringify(reqbody));
         if (reqbody.recordfile) {
@@ -132,13 +141,29 @@ app.post('/voiceAuth', async (req, res) => {
             // call voiceit api to verfiy voice.
             var resp = await voiceit.verifyVoice(user.userid, reqbody.contentLanguage, reqbody.phrase, filename).then(console.log("Returns Promise"));
             console.log("Response:" + JSON.stringify(resp));
+
+            if (resp) {
+                if (resp.responseCode == 'SUCC') {
+                    res.status(200).send(resp);
+                } else if (resp.responseCode == 'FAIL') {
+                    if (resp.confidence > 70) {
+                        res.status(200).send(resp);
+                    } else {
+                        res.status(400).send(resp);
+                    }
+                } else {
+                    res.status(400).send(resp);
+                }
+            } else {
+                res.status(400).send(resp);
+            }
         }
 
-        res.status(200).send(resp);
+
     } catch (e) {
         res.status(400).send('Error');
     }
-    console.log("-- Write Completed --");
+    console.log("-- Verification Completed --");
 });
 
 
