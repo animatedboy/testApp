@@ -10,16 +10,17 @@ var azure = require("./azure.js");
 
 var userArray = {
     'users': [{
-        ani: '9976702548',
-        userid: 'usr_d22154e4a8be43e7ad601decf18bbced',
-        active: 'y'
-    }, {
         ani: "9600860640",
         userid: "usr_d22154e4a8be43e7ad601decf18be091",
         active: "y"
     }, {
         ani: "+914440917347",
         userid: "usr_f82f1a641b8a498fb126b4c81063ebe3",
+        active: "y"
+    },
+    {
+        ani: "+914440918329",
+        userid: "usr_5edb8f5bad7b41f8b1f218cb4cb7874c",
         active: "y"
     }]
 }
@@ -146,7 +147,7 @@ app.post('/voiceAuth', async (req, res) => {
                 if (resp.responseCode == 'SUCC') {
                     res.status(200).send(resp);
                 } else if (resp.responseCode == 'FAIL') {
-                    if (resp.confidence > 70) {
+                    if (resp.confidence > 76) {
                         res.status(200).send(resp);
                     } else {
                         res.status(400).send(resp);
